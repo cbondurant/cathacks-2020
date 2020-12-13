@@ -2,13 +2,13 @@
 import weather
 import json
 import argparse
-import time
-import subprocess
 import pywal
-from random import random
+
 
 def main():
-    p = argparse.ArgumentParser(description="Runs commands for updating your system based on the current weather")
+    p = argparse.ArgumentParser(
+        description=
+        "Runs commands for updating your system based on the current weather")
     p.add_argument('-c', default="~/.config/weatherbuddy/weatherbuddy")
     p.add_argument('--noNotif', action='store_true')
     p.add_argument('--returnCurrent', action='store_true')
@@ -20,7 +20,8 @@ def main():
 
     if args.returnCurrent:
         current = w.get_weather_current()
-        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(**current)
+        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(
+            **current)
         print(current["shortForecast"], "Temp:", current['temperature'])
         colors = None
         if current['temperature'] < 33:
@@ -38,11 +39,13 @@ def main():
 
     while True:
         current = w.get_weather_current()
-        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(**current)
+        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(
+            **current)
         print(current["shortForecast"])
         if not args.noNotif:
             subprocess.run(["notify-send", notification, "-t", "5000"])
-        time.sleep(d["refreshTime"]*60)
+        time.sleep(d["refreshTime"] * 60)
+
 
 if __name__ == "__main__":
     main()
