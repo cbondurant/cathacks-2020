@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+import weather
+import json
+import argparse
+import time
+import subprocess
+import pywal
+from random import random
+
+def main():
+    p = argparse.ArgumentParser(description="Runs commands for updating your system based on the current weather")
+    p.add_argument('-c', default="~/.config/weatherbuddy/weatherbuddy")
+    p.add_argument('--noNotif', action='store_true')
+    p.add_argument('--returnCurrent', action='store_true')
+    args = p.parse_args()
+    f = None
+    f = open(args.c)
+    d = json.loads(f.read())
+    w = weather.Weather(**d)
+
+    if args.returnCurrent:
+        current = w.get_weather_current()
+        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(**current)
+        print(current["shortForecast"], "Temp:", current['temperature'])
+        colors = None
+        if current['temperature'] < 33:
+            colors = pywal.theme.file("monokai", False)
+        else:
+            colors = pywal.theme.file("vscode", False)
+
+        pywal.sequences.send(colors)
+
+        pywal.export.every(colors)
+
+        pywal.reload.i3()
+        pywal.reload.xrdb()
+        return
+
+    while True:
+        current = w.get_weather_current()
+        notification = "temp: {temperature}{temperatureUnit}\nforecast: {shortForecast}".format(**current)
+        print(current["shortForecast"])
+        if not args.noNotif:
+            subprocess.run(["notify-send", notification, "-t", "5000"])
+        time.sleep(d["refreshTime"]*60)
+
+if __name__ == "__main__":
+    main()
